@@ -5,6 +5,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // MySQL baðlantý dizesini alýyoruz
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
+}
 builder.Services.AddDbContext<WallpaperDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
@@ -16,26 +21,27 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin() // Tüm kaynaklardan gelen istekleri kabul et
-              .AllowAnyMethod() // Tüm HTTP metodlarýna izin ver
-              .AllowAnyHeader(); // Tüm baþlýklara izin ver
+        policy.AllowAnyOrigin() 
+              .AllowAnyMethod() 
+              .AllowAnyHeader();
     });
 });
 
 var app = builder.Build();
+app.UseCors("AllowAll"); 
 app.UseCors("AllowAll"); // CORS politikasýný uygula
 
-// Swagger'ý her ortamda kullan
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Wallpaper API V1");
-    c.RoutePrefix = string.Empty; // Swagger UI'yi kök dizine yerleþtir
+    c.RoutePrefix = string.Empty; 
 });
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// Uygulamayý baþlat
+
 app.Run();
