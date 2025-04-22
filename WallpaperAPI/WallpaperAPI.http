@@ -1,4 +1,4 @@
-@WallpaperAPI_HostAddress = http://localhost:5249
+@WallpaperAPI_HostAddress = https://wallpaperapi-production.up.railway.app/api
 
 GET {{WallpaperAPI_HostAddress}}/weatherforecast/
 Accept: application/json

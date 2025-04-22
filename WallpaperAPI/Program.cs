@@ -1,20 +1,34 @@
 using Microsoft.EntityFrameworkCore;
 using WallpaperAPI;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
-// Burayý MySQL uyumlu hale getiriyoruz
+// MySQL baðlantýsý
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<WallpaperDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Add services to the container.
+// Controller, Swagger, CORS
 builder.Services.AddControllers();
-// Swagger ve CORS ayarlarýn ayný kalabilir
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "WallpaperAPI", Version = "v1" });
+
+    // Üretim ortamý için Railway URL'si
+    options.AddServer(new OpenApiServer
+    {
+        Url = "https://wallpaperapi-production.up.railway.app"
+    });
+
+    // Geliþtirme ortamý için local URL
+    options.AddServer(new OpenApiServer
+    {
+        Url = "https://localhost:7011"
+    });
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -26,13 +40,16 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
 app.UseCors("AllowAll");
 
-if (app.Environment.IsDevelopment())
+// Swagger her ortamda aktif
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "WallpaperAPI v1");
+    c.RoutePrefix = string.Empty;
+});
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
