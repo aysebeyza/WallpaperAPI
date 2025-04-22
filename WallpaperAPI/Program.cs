@@ -3,19 +3,15 @@ using WallpaperAPI;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers();
+
 
 // Burayý MySQL uyumlu hale getiriyoruz
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-//builder.Services.AddDbContext<WallpaperDbContext>(options =>
-//    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddDbContext<WallpaperDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-if (string.IsNullOrEmpty(connectionString))
-{
-    // Railway ortam deðiþkeni okunuyor
-    connectionString = Environment.GetEnvironmentVariable("RAILWAY_DATABASE_URL");
-}
+// Add services to the container.
+builder.Services.AddControllers();
 // Swagger ve CORS ayarlarýn ayný kalabilir
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
