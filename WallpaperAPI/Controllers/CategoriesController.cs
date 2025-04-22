@@ -35,10 +35,8 @@ namespace WallpaperAPI.Controllers
                     return NotFound("Kategori bulunamadı.");
                 }
 
-                return Ok(new List<CategoryDto>
-               {
-                    new CategoryDto { CategoryID = 1, CategoryName = "Doğa" }
-                });
+                return Ok(categories);
+              
             }
             catch (Exception ex)
             {
