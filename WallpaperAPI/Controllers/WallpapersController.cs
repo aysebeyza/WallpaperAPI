@@ -19,29 +19,41 @@ namespace WallpaperAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WallpaperCategoryDto>>> GetAll()
         {
-            var wallpaperCategories = await _context.WallpaperCategory
-                .Include(wc => wc.Category)
-                .Include(wc => wc.Wallpaper)
-                .Select(wc => new WallpaperCategoryDto
-                {
-                    WallpaperCategoryID = wc.WallpaperCategoryID,
-                    CategoryID = wc.CategoryID,
-                    WallpaperID = wc.WallpaperID,
-                    Category = new CategoryDto
+            try
+            {
+                var wallpaperCategories = await _context.WallpaperCategory
+                    .Include(wc => wc.Category)
+                    .Include(wc => wc.Wallpaper)
+                    .Select(wc => new WallpaperCategoryDto
                     {
-                        CategoryID = wc.Category.CategoryID,
-                        CategoryName = wc.Category.CategoryName
-                    },
-                    Wallpaper = new WallpaperDto
-                    {
-                        WallpaperId = wc.Wallpaper.WallpaperId,
-                        Title = wc.Wallpaper.Title,
-                        ImageUrl = wc.Wallpaper.ImageUrl
-                    }
-                })
-                .ToListAsync();
+                        WallpaperCategoryID = wc.WallpaperCategoryID,
+                        CategoryID = wc.CategoryID,
+                        WallpaperID = wc.WallpaperID,
+                        Category = new CategoryDto
+                        {
+                            CategoryID = wc.Category.CategoryID,
+                            CategoryName = wc.Category.CategoryName
+                        },
+                        Wallpaper = new WallpaperDto
+                        {
+                            WallpaperId = wc.Wallpaper.WallpaperId,
+                            Title = wc.Wallpaper.Title,
+                            ImageUrl = wc.Wallpaper.ImageUrl
+                        }
+                    })
+                    .ToListAsync();
 
-            return Ok(wallpaperCategories);
+                if (wallpaperCategories == null || !wallpaperCategories.Any())
+                {
+                    return NotFound("Hiçbir kayıt bulunamadı.");
+                }
+
+                return Ok(wallpaperCategories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Sunucu hatası: {ex.Message}");
+            }
         }
     }
 }

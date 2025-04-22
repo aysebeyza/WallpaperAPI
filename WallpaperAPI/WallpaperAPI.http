@@ -1,4 +1,4 @@
-@WallpaperAPI_HostAddress = https://wallpaperapi-production.up.railway.app/api
+@WallpaperAPI_HostAddress = https://localhost:7011/swagger/index.html
 
 GET {{WallpaperAPI_HostAddress}}/weatherforecast/
 Accept: application/json

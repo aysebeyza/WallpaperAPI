@@ -20,15 +20,27 @@ namespace WallpaperAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
         {
-            var categories = await _context.Category
-                .Select(c => new CategoryDto
-                {
-                    CategoryID = c.CategoryID,
-                    CategoryName = c.CategoryName
-                })
-                .ToListAsync();
+            try
+            {
+                var categories = await _context.Category
+                    .Select(c => new CategoryDto
+                    {
+                        CategoryID = c.CategoryID,
+                        CategoryName = c.CategoryName
+                    })
+                    .ToListAsync();
 
-            return Ok(categories);
+                if (categories == null || !categories.Any())
+                {
+                    return NotFound("Kategori bulunamadı.");
+                }
+
+                return Ok(categories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Sunucu hatası: {ex.Message}");
+            }
         }
     }
 }
